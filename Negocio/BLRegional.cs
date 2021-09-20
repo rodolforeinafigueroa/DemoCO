@@ -2,6 +2,8 @@
 using ERP.Entidades;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +19,13 @@ namespace ERP.Negocio
         }
         public void Adicionar(Regional regional)
         {
+            ICollection<ValidationResult> results;
+            ValidacionModelo.Validate<Regional>(regional, out results);
+            if(results.Count > 0)
+            {
+                ValidacionModelo.ImprimirErrores(results);
+                return;
+            }
             _context.Add(regional);
             _context.SaveChanges();
         }

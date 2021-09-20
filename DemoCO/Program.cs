@@ -12,9 +12,9 @@ namespace ERP.FrontEnd
             var context = new ERPContext();
             // AdicionarCia();
             //ActualizarCia();
-            //AdicionarRegional(context);
+            AdicionarRegional(context);
             //AdicionarCentroOperacion(context);
-            ModificarCentroOperacion(context);
+            //ModificarCentroOperacion(context);
         }
 
         private static void ModificarCentroOperacion(ERPContext context)
@@ -57,22 +57,22 @@ namespace ERP.FrontEnd
 
         }
 
-        //private static void AdicionarRegional(ERPContext context)
-        //{
-        //    var blCompania = new BLCompania(context);
-        //    var compania1 = blCompania.Leer(1);
+        private static void AdicionarRegional(ERPContext context)
+        {
+            var blCompania = new BLCompania(context);
+            var compania1 = blCompania.Leer(1);
 
-        //    var regional = new Regional()
-        //    {
-        //        Compania = compania1,
-        //        Descripcion = "Regional 1",
-        //        Id = "R1"
-        //    };
+            var regional = new Regional()
+            {
+                Compania = compania1,
+                Descripcion = "12345678901234567890123456789012345678901234567890",
+                Id = "R41"
+            };
 
-        //    var blRegional = new BLRegional(context);
-        //    blRegional.Adicionar(regional);
+            var blRegional = new BLRegional(context);
+            blRegional.Adicionar(regional);
 
-        //}
+        }
 
         //private static void ActualizarCia()
         //{
