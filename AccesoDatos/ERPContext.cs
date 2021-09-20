@@ -18,7 +18,14 @@ namespace ERP.AccesoDatos
         {
             if (!options.IsConfigured)
             {
-                options.UseSqlServer("Server=(local); Database=ERPDemoRRF;User Id=sa; Password=sa");
+                if(Environment.MachineName == "P17FB90")
+                {
+                    options.UseSqlServer(@"Server = localhost\sqlexpress; Database = ERPDemoCHR; Integrated Security = true");                    
+                }
+                else
+                {
+                    options.UseSqlServer("Server=(local); Database=ERPDemoRRF;User Id=sa; Password=sa");
+                }                
             }
         }
 

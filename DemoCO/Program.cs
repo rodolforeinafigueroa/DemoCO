@@ -12,9 +12,10 @@ namespace ERP.FrontEnd
             var context = new ERPContext();
             // AdicionarCia();
             //ActualizarCia();
-            AdicionarRegional(context);
+            //AdicionarRegional(context);
             //AdicionarCentroOperacion(context);
-            //ModificarCentroOperacion(context);
+            ModificarCentroOperacion(context);
+            //Console.WriteLine(Environment.MachineName);
         }
 
         private static void ModificarCentroOperacion(ERPContext context)
