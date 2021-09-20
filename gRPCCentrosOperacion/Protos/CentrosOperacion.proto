@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRPCCentrosOperacion.Protos";
+
+package greet;
+
+// The greeting service definition.
+service CentroOperacionServ {
+  // Sends a greeting
+  rpc Adicionar (AdicRequest) returns (AdicReply);
+}
+
+// The request message containing the user's name.
+message AdicRequest {
+  string jsRegional = 1;
+}
+
+// The response message containing the greetings.
+message AdicReply {
+  string message = 1;
+}

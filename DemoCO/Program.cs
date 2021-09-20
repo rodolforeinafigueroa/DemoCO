@@ -1,7 +1,10 @@
 ﻿using ERP.AccesoDatos;
 using ERP.Entidades;
 using ERP.Negocio;
+using Grpc.Net.Client;
+using gRPCCentrosOperacion;
 using System;
+using System.Text.Json;
 
 namespace ERP.FrontEnd
 {
@@ -10,11 +13,11 @@ namespace ERP.FrontEnd
         static void Main(string[] args)
         {
             var context = new ERPContext();
-            // AdicionarCia();
-            //ActualizarCia();
-            //AdicionarRegional(context);
+            //AdicionarCia();
+            //ActualizarCia(context);
+            AdicionarRegional(context);
             //AdicionarCentroOperacion(context);
-            ModificarCentroOperacion(context);
+            //ModificarCentroOperacion(context);
             //Console.WriteLine(Environment.MachineName);
         }
 
@@ -63,15 +66,28 @@ namespace ERP.FrontEnd
             var blCompania = new BLCompania(context);
             var compania1 = blCompania.Leer(1);
 
+            var url = "https://localhost:5001";
+            var canal = GrpcChannel.ForAddress(url);
+            var cliente = new RegionalServ.RegionalServClient(canal);
+
             var regional = new Regional()
             {
                 Compania = compania1,
-                Descripcion = "12345678901234567890123456789012345678901234567890",
-                Id = "R41"
+                Descripcion = "Regional 3",
+                Id = "R3"
             };
 
-            var blRegional = new BLRegional(context);
-            blRegional.Adicionar(regional);
+            string jsonString = JsonSerializer.Serialize(regional);
+
+            var adicRequest = new AdicRequest();
+            adicRequest.JsRegional = jsonString;
+            var resultado = cliente.Adicionar(adicRequest);
+            var Mensaje = resultado.Message;
+
+            Console.WriteLine(Mensaje);
+
+            //var blRegional = new BLRegional(context);
+            //blRegional.Adicionar(regional);
 
         }
 
@@ -84,16 +100,23 @@ namespace ERP.FrontEnd
         //    blCompania.Actualizar(compania2);
         //}
 
-        //private static void AdicionarCia()
-        //{
-        //    var compania = new Compania()
-        //    {
-        //        RazonSocial = "Siesa S.A."
-        //    };
+        private static void AdicionarCia()
+        {
+            var compania = new Compania()
+            {
+                RazonSocial = "Siesa S.A."
+            };
 
-        //    var blCompania = new BLCompania();
-        //    blCompania.Adicionar(compania);
+            var companiaDesSer = new Compania();
 
-        //}
+
+            string jsonString = JsonSerializer.Serialize(compania);  
+            Console.WriteLine(jsonString);
+
+            Compania CiaDesSer = JsonSerializer.Deserialize<Compania>(jsonString);
+            //    var blCompania = new BLCompania();
+            //    blCompania.Adicionar(compania);
+
+        }
     }
 }
