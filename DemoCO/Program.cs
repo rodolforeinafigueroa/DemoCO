@@ -15,10 +15,27 @@ namespace ERP.FrontEnd
             var context = new ERPContext();
             //AdicionarCia();
             //ActualizarCia(context);
-            AdicionarRegional(context);
+            //AdicionarRegional(context);
             //AdicionarCentroOperacion(context);
             //ModificarCentroOperacion(context);
             //Console.WriteLine(Environment.MachineName);
+            LeerCO();
+        }
+
+        private static void LeerCO()
+        {
+            var url = "https://localhost:5001";
+            var canal = GrpcChannel.ForAddress(url);
+            var cliente = new CentroOperacionServ.CentroOperacionServClient(canal);
+
+            var coRequest = new GetCORequest();
+            coRequest.IdCo = "001";
+            var resultado = cliente.Leer(coRequest);
+            var Mensaje = resultado;
+
+            Console.WriteLine("Compañia: {0} Id: {1} Descipción: {2} Regional: {3}",Mensaje.Compania,Mensaje.Id, Mensaje.Descripcion, Mensaje.RegionalId);
+            Console.WriteLine("Cont. nombre: {0} Cont. Direccion: {1} Cont. Tel: {2} ", Mensaje.Contacto.Nombre, Mensaje.Contacto.Direccion, Mensaje.Contacto.Telefono);
+            Console.ReadKey();
         }
 
         private static void ModificarCentroOperacion(ERPContext context)

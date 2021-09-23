@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\gRPCCentrosOperacion\Protos\greet.proto" GrpcServices="Client">
-      <Link>Protos\greet.proto</Link>
-    </Protobuf>
     <Protobuf Include="..\gRPCCentrosOperacion\Protos\CentrosOperacion.proto" GrpcServices="Client">
       <Link>Protos\CentrosOperacion.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\gRPCCentrosOperacion\Protos\greet.proto" GrpcServices="Client">
+      <Link>Protos\greet.proto</Link>
     </Protobuf>
     
   </ItemGroup>

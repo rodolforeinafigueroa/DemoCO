@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entidades", "Entidades\Enti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend", "Backend\Backend.csproj", "{2A4C9C98-D797-484D-80AD-542D73DD8EA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPCCentrosOperacion", "gRPCCentrosOperacion\gRPCCentrosOperacion.csproj", "{37D0646A-9639-4D87-9670-50EF91429EF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPCCentrosOperacion", "gRPCCentrosOperacion\gRPCCentrosOperacion.csproj", "{37D0646A-9639-4D87-9670-50EF91429EF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
