@@ -4,6 +4,8 @@ using ERP.Negocio;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace gRPCCentrosOperacion
@@ -22,7 +24,7 @@ namespace gRPCCentrosOperacion
 
             try
             {
-                centroOperacion = bLCentroOperacion.Leer(request.IdCo);            
+                centroOperacion = bLCentroOperacion.Leer(request.IdCo);
             }
             catch (Exception e)
             {
@@ -53,37 +55,48 @@ namespace gRPCCentrosOperacion
         {
             var dbContext = new ERPContext();
 
-            BLCentroOperacion bLCentroOperacion = new BLCentroOperacion(dbContext);
-            CentroOperacion centroOperacion = new CentroOperacion();
-
+            var bLCentroOperacion = new BLCentroOperacion(dbContext);
+          
             try
             {
                 var centrosOperacion = bLCentroOperacion.LeerTodos();
+                var coReplyTodos = CreateCOReplyLeerTodos(centrosOperacion);
+                return Task.FromResult(coReplyTodos);
+
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error al adicionar regional" + e.Message);
             }
 
-            var respuesta = new COReply
-            {
-                Compania = centroOperacion.CompaniaId,
-                Id = centroOperacion.Id,
-                RegionalId = centroOperacion.RegionalId,
-                Descripcion = centroOperacion.Descripcion,
-                IndEstado = (COReply.Types.EstadoCO)centroOperacion.IndEstado,
-                ContactoRowid = centroOperacion.ContactoRowid,
-                Contacto = new ContactoCO
-                {
-                    Compania = centroOperacion.Contacto.CompaniaId,
-                    Nombre = centroOperacion.Contacto.Nombre,
-                    Direccion = centroOperacion.Contacto.Telefono,
-                    Telefono = centroOperacion.Contacto.Telefono
-                }
-            };
+            return Task.FromResult(new COReplyLeerTodos());
+        }
 
-            //return Task.FromResult(respuesta);
-            return null;
+        private COReplyLeerTodos CreateCOReplyLeerTodos(IEnumerable<CentroOperacion> centrosOperacion)
+        {
+
+
+            var COReplies = (from centroOperacion in centrosOperacion
+                                     select new COReply
+                                     {
+                                         Compania = centroOperacion.CompaniaId,
+                                         Id = centroOperacion.Id,
+                                         RegionalId = centroOperacion.RegionalId,
+                                         Descripcion = centroOperacion.Descripcion,
+                                         IndEstado = (COReply.Types.EstadoCO)centroOperacion.IndEstado,
+                                         ContactoRowid = centroOperacion.ContactoRowid,
+                                         Contacto = new ContactoCO
+                                         {
+                                             Compania = centroOperacion.Contacto.CompaniaId,
+                                             Nombre = centroOperacion.Contacto.Nombre,
+                                             Direccion = centroOperacion.Contacto.Telefono,
+                                             Telefono = centroOperacion.Contacto.Telefono
+                                         }
+                                     });
+
+            var coReplyTodos = new COReplyLeerTodos();
+            coReplyTodos.COReply.AddRange(COReplies);
+            return coReplyTodos;
         }
     }
 }

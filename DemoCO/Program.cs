@@ -4,6 +4,8 @@ using ERP.Negocio;
 using Grpc.Net.Client;
 using gRPCCentrosOperacion;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace ERP.FrontEnd
@@ -19,23 +21,73 @@ namespace ERP.FrontEnd
             //AdicionarCentroOperacion(context);
             //ModificarCentroOperacion(context);
             //Console.WriteLine(Environment.MachineName);
-            LeerCO();
+            //LeerCO();
+            LeerCOs();
         }
 
         private static void LeerCO()
         {
-            var url = "https://localhost:5001";
-            var canal = GrpcChannel.ForAddress(url);
-            var cliente = new CentroOperacionServ.CentroOperacionServClient(canal);
+            CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
 
             var coRequest = new GetCORequest();
             coRequest.IdCo = "001";
             var resultado = cliente.Leer(coRequest);
             var Mensaje = resultado;
 
-            Console.WriteLine("Compañia: {0} Id: {1} Descipción: {2} Regional: {3}",Mensaje.Compania,Mensaje.Id, Mensaje.Descripcion, Mensaje.RegionalId);
+            Console.WriteLine("Compañia: {0} Id: {1} Descipción: {2} Regional: {3}", Mensaje.Compania, Mensaje.Id, Mensaje.Descripcion, Mensaje.RegionalId);
             Console.WriteLine("Cont. nombre: {0} Cont. Direccion: {1} Cont. Tel: {2} ", Mensaje.Contacto.Nombre, Mensaje.Contacto.Direccion, Mensaje.Contacto.Telefono);
             Console.ReadKey();
+        }
+
+        private static CentroOperacionServ.CentroOperacionServClient CrearClientegRPC()
+        {
+            var url = "https://localhost:5001";
+            var canal = GrpcChannel.ForAddress(url);
+            var cliente = new CentroOperacionServ.CentroOperacionServClient(canal);
+            return cliente;
+        }
+
+        private static void LeerCOs()
+        {
+            CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
+
+            var coRequest = new GetCORequestLeerTodos();
+            var resultado = cliente.LeerTodos(coRequest);
+            var listaCO = ConvertirRepliesEnCentrosOperacion(resultado.COReply);
+
+
+            foreach (var centroOperacion in listaCO)
+            {
+                Console.WriteLine("Compañia: {0} Id: {1} Descipción: {2} Regional: {3}", centroOperacion.Compania, centroOperacion.Id, centroOperacion.Descripcion, centroOperacion.RegionalId);
+                Console.WriteLine("Cont. nombre: {0} Cont. Direccion: {1} Cont. Tel: {2} ", centroOperacion.Contacto.Nombre, centroOperacion.Contacto.Direccion, centroOperacion.Contacto.Telefono);
+            }
+            
+            Console.ReadKey();
+        }
+
+        private static IEnumerable<CentroOperacion> ConvertirRepliesEnCentrosOperacion(IEnumerable<COReply> centrosOperacionReply)
+        {
+
+
+            var COReplies = (from centroOperacion in centrosOperacionReply
+                             select new CentroOperacion
+                             {
+                                 CompaniaId = centroOperacion.Compania,
+                                 Id = centroOperacion.Id,
+                                 RegionalId = centroOperacion.RegionalId,
+                                 Descripcion = centroOperacion.Descripcion,
+                                 IndEstado = (CentroOperacion.Estado)centroOperacion.IndEstado,
+                                 ContactoRowid = centroOperacion.ContactoRowid,
+                                 Contacto = new Contacto
+                                 {
+                                     CompaniaId = centroOperacion.Contacto.Compania,
+                                     Nombre = centroOperacion.Contacto.Nombre,
+                                     Direccion = centroOperacion.Contacto.Direccion,
+                                     Telefono = centroOperacion.Contacto.Telefono
+                                 }
+                             });
+
+            return COReplies;
         }
 
         private static void ModificarCentroOperacion(ERPContext context)
