@@ -9,6 +9,7 @@ service CentroOperacionServ {
   // Sends a greeting
   //rpc Adicionar (AdicRequest) returns (AdicReply);
   rpc Leer (GetCORequest) returns (COReply);
+  rpc LeerTodos (GetCORequestLeerTodos) returns (COReplyLeerTodos);
 }
 
 message GetCORequest{
@@ -36,4 +37,10 @@ message ContactoCO{
 	string Telefono = 4;
 }
 
+message GetCORequestLeerTodos{
+	int32 IdCia = 1;
+}
 
+message COReplyLeerTodos{
+	repeated COReply COReply= 1;
+}

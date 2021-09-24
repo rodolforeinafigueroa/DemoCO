@@ -28,6 +28,12 @@ namespace ERP.Negocio
             return regional;
         }
 
+        public IEnumerable<CentroOperacion> LeerTodos()
+        {
+            var centroOperacion = _context.CentrosOperacion.Include("Contacto");
+            return centroOperacion;
+        }
+
         public void Actualizar(CentroOperacion centroOperacion)
         {
             _context.Update(centroOperacion);
