@@ -1,0 +1,92 @@
+﻿@using ERP.Entidades;
+@using Grpc.Net.Client;
+@using gRPCCentrosOperacion
+
+<div>
+    <h1>@Mensaje</h1>
+    <EditForm Model="centroOperacion">
+        <div class="form-group">
+            <label>Código:</label>
+            <InputText @bind-Value="centroOperacion.Id" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Descripción:</label>
+            <InputTextArea @bind-Value="centroOperacion.Descripcion" class="form-control"></InputTextArea>
+        </div>
+
+        <div class="form-group">
+            <label>Regional:</label>
+            <InputTextArea @bind-Value="centroOperacion.RegionalId" class="form-control"></InputTextArea>
+        </div>
+
+        <InputSelect @bind-Value="centroOperacion.IndEstado">
+            @foreach (var estado in Enum.GetValues(typeof(CentroOperacion.Estado)))
+            {
+                <option value="@estado">@estado</option>
+            }
+        </InputSelect>
+        <input type="button" value="Actualizar" @onclick="SalvarCO" />
+    </EditForm>
+</div>
+
+<ContactoComponent objContacto="@centroOperacion.Contacto"> </ContactoComponent>
+
+@code {
+    [Parameter]
+    public string IdCO { get; set; }
+    public CentroOperacion centroOperacion { get; set; }
+    private bool adicionar;
+    public string Mensaje;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Mensaje = String.Empty;
+        if (!String.IsNullOrEmpty(IdCO))
+        {
+
+            CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
+
+            var leerRequest = new LeerRequest()
+            {
+                IdCo = IdCO
+            };
+
+            var resultado = cliente.Leer(leerRequest);
+
+            centroOperacion = Converter.COConverter.ConvertirCOMessageEnCO(resultado.CO);
+
+        }
+        else
+        {
+            adicionar = true;
+            centroOperacion = new CentroOperacion();
+            centroOperacion.Contacto = new Contacto();
+            centroOperacion.CompaniaId = 1;
+            centroOperacion.Contacto.CompaniaId = 1;
+        }
+    }
+
+    private void SalvarCO()
+    {
+        CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
+        var coRequest = new SalvarRequest
+        {
+            CO = Converter.COConverter.ConvertirCOEnCOMessage(centroOperacion),
+            Adicionar = adicionar
+        };
+
+        var resultado = cliente.Salvar(coRequest);
+        Mensaje = resultado.Mensaje;
+    }
+
+    private static CentroOperacionServ.CentroOperacionServClient CrearClientegRPC()
+    {
+        var url = "https://localhost:5001";
+        var canal = GrpcChannel.ForAddress(url);
+        var cliente = new CentroOperacionServ.CentroOperacionServClient(canal);
+        return cliente;
+    }
+}

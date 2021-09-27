@@ -8,16 +8,13 @@ package greet;
 service CentroOperacionServ {
   // Sends a greeting
   //rpc Adicionar (AdicRequest) returns (AdicReply);
-  rpc Leer (GetCORequest) returns (COReply);
-  rpc LeerTodos (GetCORequestLeerTodos) returns (COReplyLeerTodos);
+  rpc Leer (LeerRequest) returns (LeerResponse);
+  rpc LeerTodos (LeerTodosRequest) returns (LeerTodosResponse);
   rpc AccumulateCount (stream CounterRequest) returns (CounterReply);
+  rpc Salvar(SalvarRequest) returns (SalvarResponse);
 }
 
-message GetCORequest{
-	string IdCo = 1;
-}
-
-message COReply{
+message COMessage{
 	int32 Compania = 1;
 	string Id = 2;
 	string RegionalId = 3;
@@ -29,6 +26,7 @@ message COReply{
 	EstadoCO IndEstado = 5;
 	int32 ContactoRowid = 6;
 	ContactoCO Contacto = 7;
+	bytes RowVersion = 8;
 }
 
 message ContactoCO{
@@ -38,12 +36,31 @@ message ContactoCO{
 	string Telefono = 4;
 }
 
-message GetCORequestLeerTodos{
+message LeerRequest{
+	string IdCo = 1;
+}
+
+message LeerResponse{
+	COMessage CO = 1;
+	string Mensaje  = 2;
+}
+
+message LeerTodosRequest{
 	int32 IdCia = 1;
 }
 
-message COReplyLeerTodos{
-	repeated COReply COReply= 1;
+message LeerTodosResponse{
+	repeated COMessage COs= 1;
+	string Mensaje  = 2;
+}
+
+message SalvarRequest{
+	bool adicionar = 1;
+	COMessage CO = 2;
+}
+
+message SalvarResponse{
+	string mensaje = 1;
 }
 
 message CounterRequest {
@@ -54,3 +71,4 @@ message CounterRequest {
 message CounterReply {
   int32 count = 1;
 }
+

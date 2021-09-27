@@ -34,10 +34,10 @@ namespace ERP.FrontEnd
         {
             CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
 
-            var coRequest = new GetCORequest();
-            coRequest.IdCo = "001";
-            var resultado = cliente.Leer(coRequest);
-            var Mensaje = resultado;
+            var leerRequest = new LeerRequest();
+            leerRequest.IdCo = "001";
+            var resultado = cliente.Leer(leerRequest);
+            var Mensaje = resultado.CO;
 
             Console.WriteLine("Compañia: {0} Id: {1} Descipción: {2} Regional: {3}", Mensaje.Compania, Mensaje.Id, Mensaje.Descripcion, Mensaje.RegionalId);
             Console.WriteLine("Cont. nombre: {0} Cont. Direccion: {1} Cont. Tel: {2} ", Mensaje.Contacto.Nombre, Mensaje.Contacto.Direccion, Mensaje.Contacto.Telefono);
@@ -56,9 +56,9 @@ namespace ERP.FrontEnd
         {
             CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
 
-            var coRequest = new GetCORequestLeerTodos();
-            var resultado = cliente.LeerTodos(coRequest);
-            var listaCO = ConvertirRepliesEnCentrosOperacion(resultado.COReply);
+            var leerTodosRequest = new LeerTodosRequest();
+            var resultado = cliente.LeerTodos(leerTodosRequest);
+            var listaCO = ConvertirRepliesEnCentrosOperacion(resultado.COs);
 
 
             foreach (var centroOperacion in listaCO)
@@ -70,7 +70,7 @@ namespace ERP.FrontEnd
             Console.ReadKey();
         }
 
-        private static IEnumerable<CentroOperacion> ConvertirRepliesEnCentrosOperacion(IEnumerable<COReply> centrosOperacionReply)
+        private static IEnumerable<CentroOperacion> ConvertirRepliesEnCentrosOperacion(IEnumerable<COMessage> centrosOperacionReply)
         {
 
 

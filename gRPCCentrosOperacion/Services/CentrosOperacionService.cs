@@ -13,99 +13,55 @@ namespace gRPCCentrosOperacion
     public class CentrosOperacionService : CentroOperacionServ.CentroOperacionServBase
     {
         private readonly ILogger<CentrosOperacionService> _logger;
-        public CentrosOperacionService(ILogger<CentrosOperacionService> logger) => _logger = logger;
-
-        public override Task<COReply> Leer(GetCORequest request, ServerCallContext context)
+        private readonly ERPContext dbContext;
+        private readonly BLCentroOperacion bLCentroOperacion;
+        public CentrosOperacionService(ILogger<CentrosOperacionService> logger)
         {
-            var dbContext = new ERPContext();
+            _logger = logger;
+            dbContext = new ERPContext();
+            bLCentroOperacion = new BLCentroOperacion(dbContext);
+        }
 
-            BLCentroOperacion bLCentroOperacion = new BLCentroOperacion(dbContext);
-            CentroOperacion centroOperacion = new CentroOperacion();
-
+        public override Task<LeerResponse> Leer(LeerRequest request, ServerCallContext context)
+        {
+            var respuesta = new LeerResponse();
             try
             {
-                centroOperacion = bLCentroOperacion.Leer(request.IdCo);
+                var centroOperacion = bLCentroOperacion.Leer(request.IdCo);
+                respuesta.CO = COConverter.ConvertirCOEnCOMessage(centroOperacion);
+                respuesta.Mensaje = "C.O. Encontrado";
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error al adicionar regional" + e.Message);
+                respuesta.Mensaje = "Error al leer C.O.:" + e.Message;
             }
-
-            var respuesta = new COReply
-            {
-                Compania = centroOperacion.CompaniaId,
-                Id = centroOperacion.Id,
-                RegionalId = centroOperacion.RegionalId,
-                Descripcion = centroOperacion.Descripcion,
-                IndEstado = (COReply.Types.EstadoCO)centroOperacion.IndEstado,
-                ContactoRowid = centroOperacion.ContactoRowid,
-                Contacto = new ContactoCO
-                {
-                    Compania = centroOperacion.Contacto.CompaniaId,
-                    Nombre = centroOperacion.Contacto.Nombre,
-                    Direccion = centroOperacion.Contacto.Telefono,
-                    Telefono = centroOperacion.Contacto.Telefono
-                }
-            };
 
             return Task.FromResult(respuesta);
         }
 
-        public override Task<COReplyLeerTodos> LeerTodos(GetCORequestLeerTodos request, ServerCallContext context)
+        public override Task<LeerTodosResponse> LeerTodos(LeerTodosRequest request, ServerCallContext context)
         {
-            var dbContext = new ERPContext();
-
-            var bLCentroOperacion = new BLCentroOperacion(dbContext);
-          
+            var respuesta = new LeerTodosResponse();
             try
             {
                 var centrosOperacion = bLCentroOperacion.LeerTodos();
-                var coReplyTodos = CreateCOReplyLeerTodos(centrosOperacion);
-                return Task.FromResult(coReplyTodos);
-
+                respuesta.COs.AddRange(COConverter.ConvertirMultiplesCOEnCOMessage(centrosOperacion));    
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error al adicionar regional" + e.Message);
+                respuesta.Mensaje = "Error al leer C.O.:" + e.Message;
             }
 
-            return Task.FromResult(new COReplyLeerTodos());
+            return Task.FromResult(respuesta);
         }
 
-        private COReplyLeerTodos CreateCOReplyLeerTodos(IEnumerable<CentroOperacion> centrosOperacion)
-        {
-
-
-            var COReplies = (from centroOperacion in centrosOperacion
-                                     select new COReply
-                                     {
-                                         Compania = centroOperacion.CompaniaId,
-                                         Id = centroOperacion.Id,
-                                         RegionalId = centroOperacion.RegionalId,
-                                         Descripcion = centroOperacion.Descripcion,
-                                         IndEstado = (COReply.Types.EstadoCO)centroOperacion.IndEstado,
-                                         ContactoRowid = centroOperacion.ContactoRowid,
-                                         Contacto = new ContactoCO
-                                         {
-                                             Compania = centroOperacion.Contacto.CompaniaId,
-                                             Nombre = centroOperacion.Contacto.Nombre,
-                                             Direccion = centroOperacion.Contacto.Telefono,
-                                             Telefono = centroOperacion.Contacto.Telefono
-                                         }
-                                     });
-
-            var coReplyTodos = new COReplyLeerTodos();
-            coReplyTodos.COReply.AddRange(COReplies);
-            return coReplyTodos;
-        }
-
-        public override async Task<CounterReply> AccumulateCount(IAsyncStreamReader<CounterRequest> requestStream, ServerCallContext context)
+       public override async Task<CounterReply> AccumulateCount(IAsyncStreamReader<CounterRequest> requestStream, ServerCallContext context)
         {
             var _counter = new IncrementingCounter();
 
             await foreach (var message in requestStream.ReadAllAsync())
             {
-                
+
                 _logger.LogInformation($"Incrementing count by {message.Count}");
                 Console.WriteLine(DateTime.Now + " Message count servidor:" + message.Count);
                 _counter.Increment(message.Count);
@@ -116,6 +72,33 @@ namespace gRPCCentrosOperacion
             // Proceso con todos
 
             return new CounterReply { Count = _counter.Count };
+        }
+
+        public override Task<SalvarResponse> Salvar(SalvarRequest request, ServerCallContext context)
+        {
+            var salvarResponse = new SalvarResponse();
+           
+
+            try
+            {
+                CentroOperacion centroOperacion = COConverter.ConvertirCOMessageEnCO(request.CO);
+
+                if (request.Adicionar)
+                {
+                    bLCentroOperacion.Adicionar(centroOperacion);
+                }
+                else
+                {
+                    bLCentroOperacion.Actualizar(centroOperacion);
+                }
+                salvarResponse.Mensaje = "Guardado Exitosamente";
+            }
+            catch (Exception e)
+            {
+                salvarResponse.Mensaje = "Error al guardar C.O." + e.Message;
+            }
+
+            return Task.FromResult(salvarResponse);
         }
     }
 }

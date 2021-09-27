@@ -24,8 +24,8 @@ namespace ERP.Negocio
 
         public CentroOperacion Leer(string id)
         {
-            var regional = _context.CentrosOperacion.Include("Contacto").First();
-            return regional;
+            var centroOperacion = _context.CentrosOperacion.Include("Contacto").Where(co => co.Id == id).FirstOrDefault();
+            return centroOperacion;
         }
 
         public IEnumerable<CentroOperacion> LeerTodos()
@@ -36,6 +36,7 @@ namespace ERP.Negocio
 
         public void Actualizar(CentroOperacion centroOperacion)
         {
+            _context.Entry(centroOperacion).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.Update(centroOperacion);
             _context.SaveChanges();
         }

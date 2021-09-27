@@ -1,0 +1,22 @@
+﻿@using ERP.Entidades;
+
+@page "/{IdCO}"
+
+<CentroOperacionComponent IdCO="@IdCO"> </CentroOperacionComponent>
+
+@code{
+
+    [Parameter]
+    public string IdCO { get; set; }
+
+
+    //protected override async Task OnInitializedAsync()
+    //{
+
+    //    objContacto.Telefono = "12345XX";
+    //    objContacto.Direccion = "call 59 YY";
+    //    objContacto.Nombre = "Principal";
+    //}
+
+}
+
