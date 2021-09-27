@@ -7,12 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ERP.FrontEnd
 {
     class Program
     {
-        static void Main(string[] args)
+
+        private static readonly Random Random = new Random();
+
+        static async Task Main(string[] args)
         {
             var context = new ERPContext();
             //AdicionarCia();
@@ -22,7 +26,8 @@ namespace ERP.FrontEnd
             //ModificarCentroOperacion(context);
             //Console.WriteLine(Environment.MachineName);
             //LeerCO();
-            LeerCOs();
+            //LeerCOs();
+            await ClientStreamingCallExample();
         }
 
         private static void LeerCO()
@@ -186,6 +191,26 @@ namespace ERP.FrontEnd
             //    var blCompania = new BLCompania();
             //    blCompania.Adicionar(compania);
 
+        }
+
+
+        private static async Task ClientStreamingCallExample()
+        {
+            using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            var client = new CentroOperacionServ.CentroOperacionServClient(channel);
+            using var call = client.AccumulateCount();
+            for (var i = 0; i < 100; i++)
+            {
+                var count = Random.Next(5);
+                Console.WriteLine($"{DateTime.Now} Accumulating with {count}");
+                await call.RequestStream.WriteAsync(new CounterRequest { Count = count });
+                //await Task.Delay(5000);
+            }
+
+            await call.RequestStream.CompleteAsync();
+
+            var response = await call;
+            Console.WriteLine($"Count: {response.Count}");
         }
     }
 }

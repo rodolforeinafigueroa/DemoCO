@@ -10,6 +10,7 @@ service CentroOperacionServ {
   //rpc Adicionar (AdicRequest) returns (AdicReply);
   rpc Leer (GetCORequest) returns (COReply);
   rpc LeerTodos (GetCORequestLeerTodos) returns (COReplyLeerTodos);
+  rpc AccumulateCount (stream CounterRequest) returns (CounterReply);
 }
 
 message GetCORequest{
@@ -43,4 +44,13 @@ message GetCORequestLeerTodos{
 
 message COReplyLeerTodos{
 	repeated COReply COReply= 1;
+}
+
+message CounterRequest {
+  int32 count = 1;
+}
+
+// The response message containing the current count
+message CounterReply {
+  int32 count = 1;
 }

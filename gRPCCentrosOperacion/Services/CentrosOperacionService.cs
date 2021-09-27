@@ -98,5 +98,24 @@ namespace gRPCCentrosOperacion
             coReplyTodos.COReply.AddRange(COReplies);
             return coReplyTodos;
         }
+
+        public override async Task<CounterReply> AccumulateCount(IAsyncStreamReader<CounterRequest> requestStream, ServerCallContext context)
+        {
+            var _counter = new IncrementingCounter();
+
+            await foreach (var message in requestStream.ReadAllAsync())
+            {
+                
+                _logger.LogInformation($"Incrementing count by {message.Count}");
+                Console.WriteLine(DateTime.Now + " Message count servidor:" + message.Count);
+                _counter.Increment(message.Count);
+                await Task.Delay(200);
+            }
+
+
+            // Proceso con todos
+
+            return new CounterReply { Count = _counter.Count };
+        }
     }
 }
