@@ -4,7 +4,9 @@
 
 <div>
     <h1>@Mensaje</h1>
-    <EditForm Model="centroOperacion">
+    <EditForm Model="centroOperacion" OnValidSubmit="@SalvarCO">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label>Código:</label>
             <InputText @bind-Value="centroOperacion.Id" class="form-control"></InputText>
@@ -27,6 +29,7 @@
             }
         </InputSelect>
         <input type="button" value="Actualizar" @onclick="SalvarCO" />
+        <button type="submit">Submit</button>
     </EditForm>
 </div>
 
@@ -71,6 +74,7 @@
 
     private void SalvarCO()
     {
+        
         CentroOperacionServ.CentroOperacionServClient cliente = CrearClientegRPC();
         var coRequest = new SalvarRequest
         {

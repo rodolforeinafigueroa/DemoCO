@@ -77,7 +77,8 @@ namespace gRPCCentrosOperacion
         public override Task<SalvarResponse> Salvar(SalvarRequest request, ServerCallContext context)
         {
             var salvarResponse = new SalvarResponse();
-           
+
+            Resultado resultado = new Resultado();
 
             try
             {
@@ -89,9 +90,9 @@ namespace gRPCCentrosOperacion
                 }
                 else
                 {
-                    bLCentroOperacion.Actualizar(centroOperacion);
+                    resultado = bLCentroOperacion.Actualizar(centroOperacion);
                 }
-                salvarResponse.Mensaje = "Guardado Exitosamente";
+                salvarResponse.Mensaje = resultado.ObtenerMensaje();
             }
             catch (Exception e)
             {

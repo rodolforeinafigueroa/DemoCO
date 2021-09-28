@@ -21,6 +21,7 @@ namespace ERP.Negocio
             foreach(var result in results)
             {
                 Console.WriteLine(result.ErrorMessage); 
+                
             }
         }
     }

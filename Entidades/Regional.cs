@@ -34,5 +34,5 @@ namespace ERP.Entidades
 
         public ICollection<CentroOperacion> CentrosOperacion { get; set; }
 
-    }
+    }    
 }

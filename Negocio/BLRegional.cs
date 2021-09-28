@@ -32,7 +32,7 @@ namespace ERP.Negocio
 
         public Regional Leer(string id)
         {
-            var regional = _context.Regionales.First();
+            var regional = _context.Regionales.Find(id);
             return regional;
         }
 
@@ -41,5 +41,16 @@ namespace ERP.Negocio
             _context.Update(regional);
             _context.SaveChanges();
         }
+
+        //public Resultado ValidaParaMaestros(string regionalId)
+        //{
+        //    var regional = _context.Regionales.Find(regionalId);
+        //    var resultado = new Resultado();
+        //    if(regional.IndEstado == Regional.Estado.Inactivo)
+        //    {
+        //        resultado.AdicionarError("La regional esta inactiva");
+        //    }
+        //    return resultado;
+        //}
     }
 }
