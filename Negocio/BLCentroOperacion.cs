@@ -3,6 +3,7 @@ using ERP.Entidades;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,11 +35,37 @@ namespace ERP.Negocio
             return centroOperacion;
         }
 
-        public void Actualizar(CentroOperacion centroOperacion)
+        public Resultado Actualizar(CentroOperacion centroOperacion)
         {
-            _context.Entry(centroOperacion).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.Update(centroOperacion);
-            _context.SaveChanges();
+            var resultado = ValidarModificar(centroOperacion);
+            try
+            {
+                if (resultado.Exito)
+                {
+                    _context.Entry(centroOperacion).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    _context.Update(centroOperacion);
+                    _context.SaveChanges();
+                }
+            }
+            catch(Microsoft.EntityFrameworkCore.DbUpdateException updateExpeption)
+            {
+                resultado.AdicionarError("Error al actualizar el registro ver el campo " + updateExpeption.InnerException.Message);
+            }
+            catch (Exception e)
+            {
+                resultado.AdicionarError(e.Message + e.InnerException.Message);
+            }
+
+            return resultado;
+        }
+
+        private Resultado ValidarModificar(CentroOperacion centroOperacion)
+        {
+            var resultado = new Resultado();
+            ICollection<ValidationResult> results;
+            ValidacionModelo.Validate<CentroOperacion>(centroOperacion, out results);
+            resultado.AdicionarErroresAnotaciones(results);
+            return resultado;
         }
     }
 }

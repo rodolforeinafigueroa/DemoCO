@@ -13,6 +13,7 @@ namespace ERP.Entidades
         public Compania Compania { get; set; }
 
         [Required]
+        [StringLength(2, ErrorMessage ="La regional debe ser de dos caracteres")]
         public string RegionalId { get; set; }
         public Regional Regional { get; set; }
 
